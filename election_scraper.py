@@ -28,7 +28,7 @@ def clean_url(urls):
 
 def sub_url_opener(link):
     # opens provided url from and picks the desired parent
-    res = requests.get(link[0])
+    res = requests.get(link)
     sub_soup = BeautifulSoup(res.text, "html.parser")
     sub_html = sub_soup.find("div", id="publikace")
     return sub_html
@@ -47,7 +47,10 @@ def fields_line(link):
 def voter_info(sub_html):
     cells = []
     for cell in sub_html.find_all("td", {"data-rel": "L1"}):
-        cells.append(cell.get_text())
+        if "\xa0" in cell.get_text():
+            cells.append(cell.get_text().replace("\xa0", ""))
+        else:
+            cells.append(cell.get_text())
     cells.remove(cells[2])
     return cells
 
@@ -58,23 +61,25 @@ def party_votes(sub_html):
     votes = []
     while switch < 2:
         for vote in sub_html.find_all("td", headers=tag):
-            votes.append(vote.get_text())
+            if "\xa0" in vote.get_text():
+                votes.append(vote.get_text().replace("\xa0", ""))
+            else:
+                votes.append(vote.get_text())
         tag = tag.replace("1", "2")
         switch += 1
     return votes
 
 
-def row_combiner(cod, reg, lin):
-    row = [cod[0], reg[0]]
-    row.extend(voter_info(sub_url_opener(lin)))
-    row.extend(party_votes(sub_url_opener(lin)))
-
-    return row
+def row_combiner(li, rc):
+    rc.extend(voter_info(sub_url_opener(li)))
+    rc.extend(party_votes(sub_url_opener(li)))
+    return rc
 
 
 rows = []
 regions = []
 code = []
+regions_dict = {}
 links = []
 soup = ""
 url = "https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=8&xnumnuts=5201"
@@ -94,25 +99,27 @@ else:
     soup = BeautifulSoup(response.text, "html.parser")
 tables = soup.find("div", id="inner")
 
+# gets links and region codes
 for group in tables.find_all("a"):
-    code.append(group.get_text())
     links.append(group.get("href"))
+    if str(group.get_text()).isnumeric():
+        regions_dict.setdefault(group.get_text(), "")
 links = clean_url(links)
 
+# gets region names
 for name in tables.find_all("td", {"class": "overflow_name"}):
-    regions.append(name.get_text())
+    for key in regions_dict:
+        if regions_dict[key] == "":
+            regions_dict[key] += name.get_text()
+            break
+region_code = [[cod, reg] for cod, reg, in regions_dict.items()]
 
-# print(code)
-# print(regions)
-print(fields_line(sub_url_opener(links)))
-# print(voter_info(sub_url_opener(links)))
-# print(party_votes(sub_url_opener(links)))
-print(row_combiner(code, regions, links))
-# print(soup.prettify())
-#  for row in elect.find_all("a"):
-#      rows.append(row.text)
-test = [row_combiner(code, regions, links), row_combiner(code, regions, links)]
+print("Saving results, please wait...")
+for lin, region in zip(links, region_code):
+    rows.append(row_combiner(lin, region))
+
 with open(f_name, "w", newline='\n') as f:
     write = csv.writer(f)
-    write.writerow(fields_line(sub_url_opener(links)))
-    write.writerows(test)
+    write.writerow(fields_line(sub_url_opener(links[0])))
+    write.writerows(rows)
+print(f"Results saved to {f_name}")
