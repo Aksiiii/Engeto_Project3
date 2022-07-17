@@ -81,40 +81,30 @@ regions = []
 code = []
 regions_dict = {}
 links = []
-soup, response = "soup was undefined", "response was undefined"
+soup = ""
 url = "https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=8&xnumnuts=5201"
-f_name = "example_results_HradecKrálové.csv"
+f_name = "results_file.csv"
 # url, f_name = sys.argv[1:]
-
-if ".csv" not in f_name[-4:]:
-    print("Invalid file type",
-          "Make sure the file name contains .csv at the end", sep="\n")
-    quit()
+print(url, f_name)
 
 try:
-    if ("https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=" in url
-            and url[-4:].isnumeric()):
-        print(url[-4:])
-        response = requests.get(url)
-    else:
-        print("Invalid URL")
-        quit()
-except TypeError:
+    response = requests.get(url)
+except requests.exceptions.InvalidSchema:
     print("Invalid URL")
     quit()
-soup = BeautifulSoup(response.text, "html.parser")
+except requests.exceptions.MissingSchema:
+    print("Invalid URL")
+    quit()
+else:
+    soup = BeautifulSoup(response.text, "html.parser")
 tables = soup.find("div", id="inner")
 
 # gets links and region codes
-try:
-    for group in tables.find_all("a"):
-        links.append(group.get("href"))
-        if str(group.get_text()).isnumeric():
-            regions_dict.setdefault(group.get_text(), "")
-    links = clean_url(links)
-except AttributeError:
-    print("Invalid URL")
-    quit()
+for group in tables.find_all("a"):
+    links.append(group.get("href"))
+    if str(group.get_text()).isnumeric():
+        regions_dict.setdefault(group.get_text(), "")
+links = clean_url(links)
 
 # gets region names
 for name in tables.find_all("td", {"class": "overflow_name"}):
@@ -127,7 +117,6 @@ region_code = [[cod, reg] for cod, reg, in regions_dict.items()]
 print("Saving results, please wait...")
 for lin, region in zip(links, region_code):
     rows.append(row_combiner(lin, region))
-    print(rows)
 
 with open(f_name, "w", newline='\n') as f:
     write = csv.writer(f)
