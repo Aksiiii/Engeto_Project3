@@ -16,7 +16,9 @@ from bs4 import BeautifulSoup
 
 
 def clean_url(urls):
-    # prepares the provided urls for later use
+    """fixes url subdirectory by appending domain to it
+    :param urls: list of subdirectories without a domain
+    """
     temp_link = ""
     clean_links = []
     for link in urls:
@@ -27,7 +29,9 @@ def clean_url(urls):
 
 
 def sub_url_opener(link):
-    # opens provided url from and picks the desired parent
+    """opens provided url and returns desired parent
+    :param link: url to voting data of a region
+    """
     res = requests.get(link)
     sub_soup = BeautifulSoup(res.text, "html.parser")
     sub_html = sub_soup.find("div", id="publikace")
@@ -35,7 +39,9 @@ def sub_url_opener(link):
 
 
 def fields_line(link):
-    # prepares fields for final .csv file
+    """gets party names and prepares field for .csv write
+    :param link: url to voting data of a region
+    """
     fields = ["Code", "Region", "Registered", "Envelopes", "Valid"]
     party_list = []
     for party in link.find_all("td", {"class": "overflow_name"}):
@@ -45,6 +51,9 @@ def fields_line(link):
 
 
 def voter_info(sub_html):
+    """gets and saves voter
+    :param sub_html: html containing voting data of a region
+    """
     cells = []
     for cell in sub_html.find_all("td", {"data-rel": "L1"}):
         if "\xa0" in cell.get_text():
@@ -56,6 +65,9 @@ def voter_info(sub_html):
 
 
 def party_votes(sub_html):
+    """gets party vote amounts
+    :param sub_html: html containing voting data of a region
+    """
     tag = "t1sa2 t1sb3"
     switch = 0
     votes = []
@@ -71,6 +83,10 @@ def party_votes(sub_html):
 
 
 def row_combiner(li, rc):
+    """combines voter info and party votes amount
+    :param li: url to the voting data of a region
+    :param rc: region code and region name
+    """
     rc.extend(voter_info(sub_url_opener(li)))
     rc.extend(party_votes(sub_url_opener(li)))
     return rc
@@ -92,9 +108,10 @@ except ValueError:
           sep="\n")
     quit()
 
-if ".csv" not in f_name[-4:]:
+if ".csv" not in f_name[-4:] or f_name.strip(" ") == ".csv":
     print("Invalid file type",
-          "Zkontrolujte jestli jste na konec jména souboru dali .csv ",
+          "Zkontrolujte jestli jste na konec jména souboru dali .csv",
+          "Nebo jestli jméno souboru se zkládá pouze z mezer",
           sep="\n")
     quit()
 
