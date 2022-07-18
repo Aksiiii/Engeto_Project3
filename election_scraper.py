@@ -2,14 +2,14 @@
 
 projekt_3.py: třetí projekt do Engeto Online Python Akademie
 
-author:
+author: Sebastián Nešpor
 
-email:
+email: sefarm@seznam.cz
 
-discord:
+discord: Nidra#3006
 
 """
-# import sys
+import sys
 import csv
 import requests
 from bs4 import BeautifulSoup
@@ -81,14 +81,21 @@ regions = []
 code = []
 regions_dict = {}
 links = []
+url, f_name = "url was undefined", "f_name was undefined"
 soup, response = "soup was undefined", "response was undefined"
-url = "https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=8&xnumnuts=5201"
-f_name = "example_results_HradecKrálové.csv"
-# url, f_name = sys.argv[1:]
+
+try:
+    url, f_name = sys.argv[1:]
+except ValueError:
+    print("Příliš málo/hodně argumentů",
+          "Zkontrolujte jestli jste vložili 2 argumenty",
+          sep="\n")
+    quit()
 
 if ".csv" not in f_name[-4:]:
     print("Invalid file type",
-          "Make sure the file name contains .csv at the end", sep="\n")
+          "Zkontrolujte jestli jste na konec jména souboru dali .csv ",
+          sep="\n")
     quit()
 
 try:
@@ -96,23 +103,30 @@ try:
             and url[-4:].isnumeric()):
         response = requests.get(url)
     else:
-        print("Invalid URL")
+        print("Invalid URL",
+              "Zkontrolujte jestli URL okresu je správně zadáno",
+              sep="\n")
         quit()
 except TypeError:
-    print("Invalid URL")
+    print("Invalid URL",
+          "Zkontrolujte jestli URL okresu je správně zadáno",
+          sep="\n")
     quit()
 soup = BeautifulSoup(response.text, "html.parser")
 tables = soup.find("div", id="inner")
 
 # gets links and region codes
 try:
+    print(f"Stahuju data z zadaného URL: {url}")
     for group in tables.find_all("a"):
         links.append(group.get("href"))
         if str(group.get_text()).isnumeric():
             regions_dict.setdefault(group.get_text(), "")
     links = clean_url(links)
 except AttributeError:
-    print("Invalid URL")
+    print("Invalid URL",
+          "Zkontrolujte jestli URL okresu je správně zadáno",
+          sep="\n")
     quit()
 
 # gets region names
@@ -123,7 +137,7 @@ for name in tables.find_all("td", {"class": "overflow_name"}):
             break
 region_code = [[cod, reg] for cod, reg, in regions_dict.items()]
 
-print("Saving results, please wait...")
+print(f"Ukládám data do zadaného souboru: {f_name}...")
 for lin, region in zip(links, region_code):
     rows.append(row_combiner(lin, region))
 
@@ -131,4 +145,4 @@ with open(f_name, "w", newline='\n') as f:
     write = csv.writer(f)
     write.writerow(fields_line(sub_url_opener(links[0])))
     write.writerows(rows)
-print(f"Results saved to {f_name}")
+print(f"Ukládání dokončeno, ukončuji program")
