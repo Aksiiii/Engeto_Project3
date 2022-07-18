@@ -18,11 +18,11 @@ a nainstalovat knihovny následovně:
 
 ### lze i nainstalovat jednotlivé knihovny přímo:
 
->pip3 install <jmeno-knihovny> ***/nainstaluje danou Knihovnu/***
+>pip3 install <jmeno-knihovny> ***/nainstaluje danou knihovnu/***
 > 
 > pip3 uninstall <jmeno-knihovny> ***/odinstaluje danou knihovnu/***
 
-Tohle se ale nedoporučuje, jelikož může dojít ke konfliktům s jinýma knihovnama, nebo rozdílu ve verzích podpůrných knihoven.
+Tohle se ale nedoporučuje, jelikož může dojít ke konfliktům s jinými knihovnami, nebo rozdílu ve verzích podpůrných knihoven.
 Proto je doporučeno pracovat pouze ve virtualním prostředí
 
 ## Spuštění projektu
@@ -58,6 +58,6 @@ Ukládání dokončeno, ukončuji program
 
 ### Částečný průběh:
 
-Code,Region,Registered,Envelopes,Valid...
-569828,Babice,165,109,108,7,1,0,4,0,7,19,3,0,0,1,0,6,0,9,36,0,0,2,1,0,0,12,0
+Code,Region,Registered,Envelopes,Valid...<br>
+569828,Babice,165,109,108,7,1,0,4,0,7,19,3,0,0,1,0,6,0,9,36,0,0,2,1,0,0,12,0<br>
 569836,Barchov,227,141,140,21,0,0,9,0,5,16,2,0,2,0,0,19,1,4,46,1,0,3,2,1,1,6,1<br>...
