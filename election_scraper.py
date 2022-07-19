@@ -105,13 +105,15 @@ try:
 except ValueError:
     print("Příliš málo/hodně argumentů",
           "Zkontrolujte jestli jste vložili 2 argumenty",
+          "Nebo omylem vložili tento znak \\ ",
           sep="\n")
     quit()
 
-if ".csv" not in f_name[-4:] or f_name.strip(" ") == ".csv":
+if ".csv" not in f_name[-4:] or f_name.strip(" ") == ".csv" or "\\" in f_name:
     print("Invalid file type",
           "Zkontrolujte jestli jste na konec jména souboru dali .csv",
           "Nebo jestli jméno souboru se zkládá pouze z mezer",
+          "Nebo neobsahuje tento znak \\ ",
           sep="\n")
     quit()
 

@@ -36,13 +36,12 @@ výsledek bude uložen do vámi zadaného souboru s připonou ***.csv*** <br>
 ## Ukázka spuštění a výsledku
 
 Výsledky hlasovaní budou pro okres Hradec Kralové. <br>
-Spuštění přes terminal CMD ve virtualním prostředí
 
 1. argument: `https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=8&xnumnuts=5201`
 
 2. argument: `hradec_králové.csv`
 
-#### Spuštění skriptu:
+#### Spuštění přes terminal CMD ve virtualním prostředí:
 
 >python election_scraper.py "https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=8&xnumnuts=5201" "hradec_králové.csv"
 
