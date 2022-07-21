@@ -112,7 +112,7 @@ except ValueError:
 if ".csv" not in f_name[-4:] or f_name.strip(" ") == ".csv" or "\\" in f_name:
     print("Invalid file type",
           "Zkontrolujte jestli jste na konec jména souboru dali .csv",
-          "Nebo jestli jméno souboru se zkládá pouze z mezer",
+          "Nebo jestli jméno souboru se skládá pouze z mezer",
           "Nebo neobsahuje tento znak \\ ",
           sep="\n")
     quit()
